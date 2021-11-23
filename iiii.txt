@@ -1,0 +1,44 @@
+#include <iostream>
+#include <vector>
+
+
+using namespace std;
+
+
+int main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    int n;
+    cin >> n;
+
+    vector<int> primes;
+    vector<int> mind;
+    for (int i = 0; i <= n; ++i) {
+        mind.push_back(i);
+    }
+
+    for (int k = 2; k <= n; ++k) {
+        if (mind[k] == k) {
+            primes.push_back(k);
+        }
+        for (int i = 0; i < primes.size(); ++i) {
+            if (primes[i] * k <= n && primes[i] <= mind[k]) {
+                mind[primes[i] * k] = primes[i];
+            }
+            else break;
+        }
+    }
+
+    long long ans = 0;
+    for (int i = 4; i <= n; ++i) {
+        if (mind[i] != i) {
+            ans += mind[i];
+        }
+    }
+
+    cout << ans;
+    
+    return 0;
+}

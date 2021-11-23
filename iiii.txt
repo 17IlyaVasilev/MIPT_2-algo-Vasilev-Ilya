@@ -1,0 +1,99 @@
+#include <iostream>
+#include <vector>
+#include <complex>
+#include <cmath>
+
+
+const double PI = acos(-1);
+void fft(std::vector<std::complex<double>>& a, bool invert) {
+	if (a.size() == 1) {
+		return;
+	}
+
+	std::vector<std::complex<double>> a_even;
+	std::vector<std::complex<double>> a_odd;
+	for (long long i = 0; i < a.size(); ++i) {
+		if (i % 2) {
+			a_odd.push_back(a[i]);
+		}
+		else {
+			a_even.push_back(a[i]);
+		}
+	}
+
+	fft(a_even, invert);
+	fft(a_odd, invert);
+
+	double ang = 2 * PI / a.size();
+	if (invert) {
+		ang *= -1;
+	}
+
+	std::complex<double> w(1);
+	std::complex<double> wn(cos(ang), sin(ang));
+	for (long long i = 0; i < a.size() / 2; ++i) {
+		a[i] = a_even[i] + w * a_odd[i];
+		a[i + a.size() / 2] = a_even[i] - w * a_odd[i];
+		if (invert) {
+			a[i] /= 2;
+			a[i + a.size() / 2] /= 2;
+		}
+		w *= wn;
+	}
+}
+
+
+void multiply(const std::vector<long long>& a, const std::vector<long long>& b, std::vector<long long>& res) {
+	std::vector<std::complex<double>> fa(a.begin(), a.end());
+	std::vector<std::complex<double>> fb(b.begin(), b.end());
+
+	long long sz = 1;
+	while (sz < std::max(a.size(), b.size())) {
+		sz <<= 1;
+	}
+	sz <<= 1;
+	fa.resize(sz);
+	fb.resize(sz);
+	fft(fa, false);
+	fft(fb, false);
+
+	for (long long i = 0; i < sz; ++i) {
+		fa[i] *= fb[i];
+	}
+	fft(fa, true);
+
+	res.resize(sz);
+	for (long long i = 0; i < sz; ++i) {
+		res[i] = (long long)(round(fa[i].real()));
+	}
+}
+
+int main() {
+	std::ios_base::sync_with_stdio(false);
+	std::cin.tie(nullptr);
+	std::cout.tie(nullptr);
+
+	long long n;
+	std::cin >> n;
+	std::vector<long long> a(n + 1);
+	for (long long i = 0; i <= n; ++i) {
+		std::cin >> a[i];
+	}
+
+	long long m;
+	std::cin >> m;
+	std::vector<long long> b(m + 1);
+	for (long long i = 0; i <= m; ++i) {
+		std::cin >> b[i];
+	}
+
+	std::vector<long long> res;
+	multiply(a, b, res);
+
+	std::cout << n + m << ' ';
+	for (int i = 0; i <= n + m; ++i) {
+		std::cout << res[i] << ' ';
+	}
+
+	return 0;
+}

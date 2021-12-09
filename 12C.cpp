@@ -1,10 +1,6 @@
-﻿#include <iostream>
+#include <iostream>
 #include <algorithm>
 #include <vector>
-
-
-using namespace std;
-
 
 class SuffAuto {
 private:
@@ -13,7 +9,7 @@ private:
 		long long len = 0;
 		long long link = -1;
 		bool term = false;
-		vector <long long> to;
+		std::vector <long long> to;
 
 		long long count = 0;
 		bool used = false;
@@ -21,151 +17,131 @@ private:
 		Node(const long long& m) {
 			to.assign(m, -1);
 		}
-
-		//Node operator= (const Node& node) = delete;
-
-		//~Node() {};
 	};
 
-	long long n = 0;
-	long long m = 0;
+	long long num = 0;
+	long long alpha_num = 0;
 	long long last = 0;
-	long long maxx = -1;
+	long long max = -1;
 	long long ind = -1;
-	vector<Node> t;
+	std::vector<Node> nodes;
 
 public:
 	SuffAuto(const long long&, const long long&);
-	//SuffAuto operator= (const SuffAuto& suffauto) = delete;
 	long long dfs(const long long&);
-	void add(const long long&, long long&);
-	vector<long long> answer();
-	//~SuffAuto() {};
+	void add(const long long&, const size_t&);
+	std::vector<long long> answer();
 };
 
 
-SuffAuto::SuffAuto(const long long& num, const long long& dif) {
-	m = dif;
-	n = num;
-	t.push_back(Node(dif));
-	t.back().term = true;
+SuffAuto::SuffAuto(const long long& num, const long long& dif): num(num), alpha_num(dif){
+	nodes.push_back(Node(dif));
+	nodes.back().term = true;
 }
 
 
-long long SuffAuto::dfs(const long long& v) {
-	if (t[v].used) {
-		return t[v].count;
+long long SuffAuto::dfs(const long long& vert) {
+	if (nodes[vert].used) {
+		return nodes[vert].count;
 	}
 	else {
-		t[v].used = true;
+		nodes[vert].used = true;
 	}
 
-	if (t[v].term) {
-		t[v].count = 1;
+	if (nodes[vert].term) {
+		nodes[vert].count = 1;
 	}
 	else {
-		t[v].count = 0;
+		nodes[vert].count = 0;
 	}
-
-
-	for (long long i = 0; i < t[v].to.size(); ++i) {
-		if (t[v].to[i] > 0) {
-			t[v].count += dfs(t[v].to[i]);
+	for (size_t i = 0; i < nodes[vert].to.size(); ++i) {
+		if (nodes[vert].to[i] > 0) {
+			nodes[vert].count += dfs(nodes[vert].to[i]);
 		}
 	}
-
-	if (maxx < t[v].len * t[v].count) {
-		ind = v;
-		maxx = max(maxx, t[v].len * t[v].count);
+	if (max < nodes[vert].len * nodes[vert].count) {
+		ind = vert;
+		max = std::max(max, nodes[vert].len * nodes[vert].count);
 	}
-
-	return t[v].count;
+	return nodes[vert].count;
 }
 
 
-void SuffAuto::add(const long long& c, long long& index) {
-	t.push_back(Node(m));
+void SuffAuto::add(const long long& c, const size_t& index) {
+	nodes.push_back(Node(alpha_num));
+	auto curr = nodes.size() - 1;
+	auto vert = last;
 
-	auto curr = t.size() - 1;
-	auto p = last;
-	while (p != -1 && t[p].to[c] == -1) {
-		t[p].to[c] = curr;
-		p = t[p].link;
+	while (vert != -1 && nodes[vert].to[c] == -1) {
+		nodes[vert].to[c] = curr;
+		vert = nodes[vert].link;
 	}
-
-	t[curr].end = index;
-	t[curr].len = t[curr].end + 1;
-	if (p == -1) {
-		t[curr].link = 0;
+	nodes[curr].end = index;
+	nodes[curr].len = nodes[curr].end + 1;
+	if (vert == -1) {
+		nodes[curr].link = 0;
 		last = curr;
 		return;
 	}
 
-	auto q = t[p].to[c];
-	if (t[q].len == t[p].len + 1) {
-		t[curr].link = q;
+	auto new_vert = nodes[vert].to[c];
+	if (nodes[new_vert].len == nodes[vert].len + 1) {
+		nodes[curr].link = new_vert;
 		last = curr;
 		return;
 	}
-
-	t.push_back(Node(m));
-	auto clone = t.size() - 1;
-	t[clone].len = t[p].len + 1;
-	t[clone].end = t[q].end;
-	while (p != -1 && t[p].to[c] == q) {
-		t[p].to[c] = clone;
-		p = t[p].link;
+	nodes.push_back(Node(alpha_num));
+	auto clone = nodes.size() - 1;
+	nodes[clone].len = nodes[vert].len + 1;
+	nodes[clone].end = nodes[new_vert].end;
+	while (vert != -1 && nodes[vert].to[c] == new_vert) {
+		nodes[vert].to[c] = clone;
+		vert = nodes[vert].link;
 	}
-	t[clone].to = t[q].to;
-	t[clone].link = t[q].link;
-	t[q].link = clone;
-	t[curr].link = clone;
+	nodes[clone].to = nodes[new_vert].to;
+	nodes[clone].link = nodes[new_vert].link;
+	nodes[new_vert].link = clone;
+	nodes[curr].link = clone;
 	last = curr;
 }
 
 
-vector<long long> SuffAuto::answer() {
-	vector<long long> ans(3, 0);
-
-	long long v = last;
-	while (v != -1) {
-		t[v].term = true;
-		v = t[v].link;
+std::vector<long long> SuffAuto::answer() {
+	std::vector<long long> ans(3, 0);
+	long long vert = last;
+	while (vert != -1) {
+		nodes[vert].term = true;
+		vert = nodes[vert].link;
 	}
-
 	dfs(0);
-
-	ans[0] = maxx;
-	ans[1] = t[ind].end;
-	ans[2] = t[ind].len;
-
+	ans[0] = max;
+	ans[1] = nodes[ind].end;
+	ans[2] = nodes[ind].len;
 	return ans;
 }
 
 
 
 int main() {
-	ios_base::sync_with_stdio(false);
-	cin.tie(nullptr);
-	cout.tie(nullptr);
+	std::ios_base::sync_with_stdio(false);
+	std::cin.tie(nullptr);
+	std::cout.tie(nullptr);
 
 	long long n, m;
-	cin >> n >> m;
+	std::cin >> n >> m;
 
 	SuffAuto suffauto(n, m);
-	vector<long long> s(n, 0);
-
-	for (long long i = 0; i < n; ++i) {
-		cin >> s[i];
-		suffauto.add(s[i] - 1, i);
+	std::vector<long long> seq(n, 0);
+	for (size_t i = 0; i < n; ++i) {
+		std::cin >> seq[i];
+		suffauto.add(seq[i] - 1, i);
 	}
 
-	vector<long long> ans = suffauto.answer();
-	cout << ans[0] << endl;
-	cout << ans[2] << endl;
-
-	for (long long i = ans[1] - ans[2]; i < ans[1]; ++i) {
-		cout << s[i + 1] << ' ';
+	std::vector<long long> ans = suffauto.answer();
+	std::cout << ans[0] << std::endl;
+	std::cout << ans[2] << std::endl;
+	for (int i = ans[1] - ans[2]; i < ans[1]; ++i) {
+		std::cout << seq[i + 1] << ' ';
 	}
 
 	return 0;

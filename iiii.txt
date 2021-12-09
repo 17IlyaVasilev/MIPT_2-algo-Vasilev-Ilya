@@ -2,98 +2,95 @@
 #include <vector>
 #include <set>
 
+const long long limit = 2000000;
 
-using namespace std;
-
-
-const int big = 2000000;
-set<int> pset;
-vector<int> mind;
-
-void DecForPrimes(int a) {
+void DecForPrimes(int a, const std::vector<int>& mind, std::set<int>& pset) {
     if (a == 1) {
         return;
     }
-
     pset.erase(mind[a]);
-    DecForPrimes(a / mind[a]);
+    DecForPrimes(a / mind[a], mind, pset);
 }
 
-bool check(int a) {
+bool check(int a, const std::vector<int>& mind, const std::set<int>& pset) {
     if (a == 1) {
         return true;
     }
-
-    return (pset.find(mind[a]) != pset.end()) && check(a / mind[a]);
+    return (pset.find(mind[a]) != pset.end()) && check(a / mind[a], mind, pset);
 }
 
-
-int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
-    cout.tie(nullptr);
-
-    int n;
-    cin >> n;
-    vector<int> a(n);
-    for (int i = 0; i < n; ++i) {
-        cin >> a[i];
-    }
-
-    vector<int> primes;
-    for (int i = 0; i <= big; ++i) {
+std::vector<long long> find_min_arr(const std::vector<long long>& a) {
+    std::set<int> pset;
+    std::vector<int> mind; 
+    std::vector<int> primes;
+    for (int i = 0; i <= limit; ++i) {
         mind.push_back(i);
     }
-
-    for (int k = 2; k <= big; ++k) {
+    for (int k = 2; k <= limit; ++k) {
         if (mind[k] == k) {
             primes.push_back(k);
         }
-        for (int i = 0; i < primes.size(); ++i) {
-            if (primes[i] * k <= big && primes[i] <= mind[k]) {
+        for (size_t i = 0; i < primes.size(); ++i) {
+            if (primes[i] * k <= limit && primes[i] <= mind[k]) {
                 mind[primes[i] * k] = primes[i];
             }
-            else break;
+            else {
+                break;
+            }
         }
     }
-
-    for (int i = 2; i < big; ++i) {
+    for (int i = 2; i < limit; ++i) {
         if (mind[i] == i) {
             pset.insert(i);
         }
     }
-
-    cout << a[0];
-    DecForPrimes(a[0]);
+    std::vector<long long> ans;
+    ans.push_back(a[0]);
+    DecForPrimes(a[0], mind, pset);
     bool flag = true;
-
-    for (int i = 1; i < n; ++i) {
+    for (size_t i = 1; i < a.size(); ++i) {
         auto temp = pset.lower_bound(a[i]);
         if (flag) {
             int tempx = *temp;
             for (int j = a[i]; j < *temp; ++j) {
-                if (check(j)) {
+                if (check(j, mind, pset)) {
                     tempx = j;
-                    DecForPrimes(j);
+                    DecForPrimes(j, mind, pset);
                     break;
                 }
             }
-
             if (*temp == tempx) {
                 pset.erase(*temp);
             }
-
-            cout << " " << tempx;
+            ans.push_back(tempx);
             if (tempx != a[i]) {
                 flag = false;
             }
         }
         else {
             auto temp = pset.lower_bound(1);
-            cout << " " << *temp;
+            ans.push_back(*temp);
             pset.erase(*temp);
         }
-        
+    }
+    return ans;
+}
+
+int main() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    std::cout.tie(nullptr);
+
+    int n;
+    std::cin >> n;
+    std::vector<long long> a(n);
+    for (size_t i = 0; i < n; ++i) {
+        std::cin >> a[i];
+    }
+
+    std::vector<long long> ans = find_min_arr(a);
+    for (auto i : ans) {
+        std::cout << i << " ";
     }
 
     return 0;

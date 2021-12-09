@@ -1,73 +1,65 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
-#include <cmath>
 #include <string>
+#include <algorithm>
 
-
-using namespace std;
-
-
-vector<long long> z_function(const string& str) {
-	long long n = str.length();
-	vector<long long> z(n);
-	long long l = -1, r = -1;
-	z[0] = 0;
-	for (long long i = 1; i < n; ++i) {
-		if (l <= i && i <= r) {
-			z[i] = min(z[i - l], r - i + 1);
+std::vector<long long> z_function(const std::string& str) {
+	size_t num = str.length();
+	std::vector<long long> z_func(num);
+	long long left = -1;
+	long long right = -1;
+	z_func[0] = 0;
+	for (size_t i = 1; i < num; ++i) {
+		if (left <= i && i <= right) {
+			z_func[i] = std::min(z_func[i - left], right - i + 1);
 		}
 
-		while (z[i] + i < n && str[z[i]] == str[i + z[i]]) {
-			++z[i];
+		while (z_func[i] + i < num && str[z_func[i]] == str[i + z_func[i]]) {
+			++z_func[i];
 		}
 
-		if (i + z[i] - 1 > r) {
-			l = i;
-			r = i + z[i] - 1;
+		if (i + z_func[i] - 1 > right) {
+			left = i;
+			right = i + z_func[i] - 1;
 		}
 	}
-
-	return z;
+	return z_func;
 }
 
-vector<long long> solve(const string& text, const string& pattern, const long long& k) {
-	long long tl = text.length();
-	long long pl = pattern.length();
-	vector<long long> z = z_function(pattern + text);
-	string t_text = text;
-	string t_pattern = pattern;
-	reverse(t_pattern.begin(), t_pattern.end());
-	reverse(t_text.begin(), t_text.end());
-	vector<long long> rz = z_function(t_pattern + t_text);
-
-	vector <long long> ans;
-	for (long long i = 0; i < tl - pl + 1; ++i) {
-		if (z[i + pl] + rz[tl - i] + k >= pl) {
+std::vector<long long> solve(const std::string& text, const std::string& pattern, const long long& max_dif) {
+	size_t tlen = text.length();
+	size_t plen = pattern.length();
+	std::vector<long long> z_func = z_function(pattern + text);
+	std::string t_text = text;
+	std::string t_pattern = pattern;
+	std::reverse(t_pattern.begin(), t_pattern.end());
+	std::reverse(t_text.begin(), t_text.end());
+	std::vector<long long> reverse_z_func = z_function(t_pattern + t_text);
+	std::vector<long long> ans;
+	for (size_t i = 0; i < tlen - plen + 1; ++i) {
+		if (z_func[i + plen] + reverse_z_func[tlen - i] + max_dif >= plen) {
 			ans.push_back(i);
 		}
 	}
-
 	return ans;
 }
 
 
 int main() {
-	ios_base::sync_with_stdio(false);
-	cin.tie(nullptr);
-	cout.tie(nullptr);
+	std::ios_base::sync_with_stdio(false);
+	std::cin.tie(nullptr);
+	std::cout.tie(nullptr);
 
-	string text, pattern;
-	cin >> text;
-	cin >> pattern;
-	long long k;
-	cin >> k;
+	std::string text, pattern;
+	std::cin >> text;
+	std::cin >> pattern;
+	long long max_dif;
+	std::cin >> max_dif;
 
-	vector<long long> ans = solve(text, pattern, k);
-
-	cout << ans.size() << endl;
+	std::vector<long long> ans = solve(text, pattern, max_dif);
+	std::cout << ans.size() << std::endl;
 	for (auto i : ans) {
-		cout << i + 1 << ' ';
+		std::cout << i + 1 << ' ';
 	}
 
 	return 0;

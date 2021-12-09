@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 
 
 long long lcp(long long i, long long j, const long long& n, const std::vector<std::vector<long long>>& classes) {

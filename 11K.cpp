@@ -1,74 +1,64 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
-#include <cmath>
 #include <string>
 #include <set>
 
 
-using namespace std;
-
-vector<int> z_function(const string& str) {
-	int n = str.length();
-	vector<int> z(n);
-	int l = -1, r = -1;
-	z[0] = 0;
-	for (int i = 1; i < n; ++i) {
-		if (l <= i && i <= r) {
-			z[i] = min(z[i - l], r - i + 1);
+std::vector<long long> z_function(const std::string& str) {
+	size_t num = str.length();
+	std::vector<long long> z_func(num);
+	long long left = -1;
+	long long right = -1;
+	z_func[0] = 0;
+	for (size_t i = 1; i < num; ++i) {
+		if (left <= i && i <= right) {
+			z_func[i] = std::min(z_func[i - left], right - i + 1);
 		}
 
-		while (z[i] + i < n && str[z[i]] == str[i + z[i]]) {
-			++z[i];
+		while (z_func[i] + i < num && str[z_func[i]] == str[i + z_func[i]]) {
+			++z_func[i];
 		}
 
-		if (i + z[i] - 1 > r) {
-			l = i;
-			r = i + z[i] - 1;
+		if (i + z_func[i] - 1 > right) {
+			left = i;
+			right = i + z_func[i] - 1;
 		}
 	}
-
-	return z;
+	return z_func;
 }
 
-long long sum_all_subwords(const string& cstr) {
-	string str = cstr;
+long long sum_all_subwords(const std::string& cstr) {
+	std::string str = cstr;
 	long long ans = 0;
-
-	set<string> s;
-	vector<int> num;
-	string nstr = "";
-	vector<int> maxx(str.length(), 0);
-
-	for (int i = 1; i <= str.length(); ++i) {
+	std::string new_str = "";
+	std::vector<long long> max(str.length(), 0);
+	for (size_t i = 1; i <= str.length(); ++i) {
 		ans += i * (str.length() - i + 1);
 	}
 
 	for (int i = str.length() - 1; i >= 0; --i) {
-		nstr = str[i] + nstr;
-		vector<int> z = z_function(nstr);
-
-		for (int j = 0; j < z.size(); ++j) {
-			if (z[j] > 0 && maxx[str.length() - nstr.length() + j] < z[j]) {
-				ans -= (z[j] * (z[j] + 1) / 2 - maxx[str.length() - nstr.length() + j] * (maxx[str.length() - nstr.length() + j] + 1) / 2);
-				maxx[str.length() - nstr.length() + j] = max(maxx[str.length() - nstr.length() + j], z[j]);
+		new_str = str[i] + new_str;
+		std::vector<long long> z_func = z_function(new_str);
+		for (size_t j = 0; j < z_func.size(); ++j) {
+			if (z_func[j] > 0 && max[str.length() - new_str.length() + j] < z_func[j]) {
+				ans -= (z_func[j] * (z_func[j] + 1) / 2 - max[str.length() - new_str.length() + j] * (max[str.length() - new_str.length() + j] + 1) / 2);
+				max[str.length() - new_str.length() + j] = std::max(max[str.length() - new_str.length() + j], z_func[j]);
 			}
 		}
 	}
-
 	return ans;
 }
 
 
 int main() {
-	ios_base::sync_with_stdio(false);
-	cin.tie(nullptr);
-	cout.tie(nullptr);
+	std::ios_base::sync_with_stdio(false);
+	std::cin.tie(nullptr);
+	std::cout.tie(nullptr);
 
-	string str;
-	cin >> str;
+	std::string str;
+	std::cin >> str;
 
-	cout << sum_all_subwords(str);
+	std::cout << sum_all_subwords(str);
 
 	return 0;
 }

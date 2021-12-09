@@ -1,24 +1,20 @@
 #include <iostream>
 #include <vector>
 
-
-using namespace std;
-
-
 const long long p = 1000000007;
 
 long long binpow(long long a, long long n) {
-	if (n == 0)
+	if (n == 0) {
 		return 1;
-	if (n % 2 == 1)
+	}
+	if (n % 2 == 1) {
 		return ((binpow(a, n - 1) % p) * (a % p)) % p;
+	}
 	else {
 		long long b = binpow(a, n / 2) % p;
 		return (b * b) % p;
 	}
 }
-
-
 
 long long stirling_number(long long n, long long k) {
 	long long k_factorial = 1;
@@ -34,28 +30,26 @@ long long stirling_number(long long n, long long k) {
 			StirlingNumber = (StirlingNumber + (C * binpow(i, n)) % p) % p;
 		}
 	}
-
 	StirlingNumber = (StirlingNumber * binpow(k_factorial, p - 2) % p) % p;
-
 	return StirlingNumber;
 }
 
 
 int main() {
-	ios_base::sync_with_stdio(false);
-	cin.tie(nullptr);
-	cout.tie(nullptr);
+	std::ios_base::sync_with_stdio(false);
+	std::cin.tie(nullptr);
+	std::cout.tie(nullptr);
 
 	long long k, n;
-	cin >> n >> k;
-	vector<long long> a(n);
+	std::cin >> n >> k;
+	std::vector<long long> a(n);
 	long long sum_a = 0;
 	for (long long i = 0; i < n; ++i) {
-		cin >> a[i];
+		std::cin >> a[i];
 		sum_a = (sum_a + a[i]) % p;
 	}
 
-	cout << (((stirling_number(n - 1, k - 1) + ((n + k - 1) * stirling_number(n - 1, k)) % p) % p) * sum_a) % p;
+	std::cout << (((stirling_number(n - 1, k - 1) + ((n + k - 1) * stirling_number(n - 1, k)) % p) % p) * sum_a) % p;
 
 	return 0;
 }

@@ -1,49 +1,50 @@
 #include <iostream>
 
-
-using namespace std;
-
-
 const long long p = 1000000007;
-
 
 long long gcd(const long long& a, const long long& b, long long& x, long long& y) {
 	if (a == 0) {
-		x = 0; 
+		x = 0;
 		y = 1;
-
 		return (b % p);
 	}
-
 	long long prev_x = 0;
 	long long prev_y = 0;
 	long long gcd_ab = gcd(b % a, a, prev_x, prev_y);
-
 	y = prev_x % p;
 	x = (prev_y - (b / a) * prev_x) % p;
-
 	return (gcd_ab % p);
 }
 
-
-int main(){
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
-    cout.tie(nullptr);
-
-    long long a, b, c, d;
-    cin >> a >> b >> c >> d;
-
-	if (a < 0) a += p;
-	if (b < 0) b += p;
-	if (c < 0) c += p;
-	if (d < 0) d += p;
-
+long long calculate(long long a, long long b, long long c, long long d) {
+	if (a < 0) {
+		a += p;
+	}
+	if (b < 0) {
+		b += p;
+	}
+	if (c < 0) {
+		c += p;
+	}
+	if (d < 0) {
+		d += p;
+	}
 	long long x = 0;
 	long long y = 0;
-    long long gcd_ = gcd(b * d, p, x, y);
+	long long gcd_ = gcd(b * d, p, x, y);
+	return (((x + p) % p) * ((a * d + b * c) % p) + p) % p;
+}
 
-	cout << (((x + p) % p) * ((a * d + b * c) % p) + p) % p;
-    
-    return 0;
+
+int main() {
+	std::ios_base::sync_with_stdio(false);
+	std::cin.tie(nullptr);
+	std::cout.tie(nullptr);
+
+	long long a, b, c, d;
+	std::cin >> a >> b >> c >> d;
+
+	std::cout << calculate(a, b, c, d);
+
+	return 0;
 }
